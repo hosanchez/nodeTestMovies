@@ -7,23 +7,24 @@ const cors = require('cors')
 
 const app = express()
 app.use(express.json())
-// app.use(cors({
-//     origin:(origin, callback) =>{
-//         const ACCEPTED_ORIGINS = [
-//             'http://localhost:8080',
-//             'http://localhost:123',
-//             'http://movies.com',
-//             'http://midu.dev'
-//         ]
+app.use(cors({
+    origin:(origin, callback) =>{
+        const ACCEPTED_ORIGINS = [
+            'http://localhost:8080',
+            'http://localhost:123',
+            'http://movies.com',
+            'http://midu.dev',
+            'https://nodetestmovies-production.up.railway.app'
+        ]
         
-//         if (ACCEPTED_ORIGINS.includes(origin)) {
-//             return callback(null, true)
-//         }
-//     }
-// }))
+        if (ACCEPTED_ORIGINS.includes(origin)) {
+            return callback(null, true)
+        }
+    }
+}))
 
 //comentario
-app.use(cors())
+// app.use(cors())
 app.disable('x-powered-by')// deshabilitar el header x-Powered-By: Express
 
 // Todos los recursos que sean MOVIES se identifica con /movies
