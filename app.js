@@ -21,6 +21,8 @@ app.use(express.json())
 //         }
 //     }
 // }))
+
+//comentario
 app.use(cors())
 app.disable('x-powered-by')// deshabilitar el header x-Powered-By: Express
 
