@@ -7,26 +7,25 @@ const cors = require('cors')
 
 const app = express()
 app.use(express.json())
-app.use(cors({
-    origin:(origin, callback) =>{
-        const ACCEPTED_ORIGINS = [
-            'http://localhost:8080',
-            'http://localhost:123',
-            'http://movies.com',
-            'http://midu.dev'
-        ]
+// app.use(cors({
+//     origin:(origin, callback) =>{
+//         const ACCEPTED_ORIGINS = [
+//             'http://localhost:8080',
+//             'http://localhost:123',
+//             'http://movies.com',
+//             'http://midu.dev'
+//         ]
         
-        if (ACCEPTED_ORIGINS.includes(origin)) {
-            return callback(null, true)
-        }
-    }
-}))
+//         if (ACCEPTED_ORIGINS.includes(origin)) {
+//             return callback(null, true)
+//         }
+//     }
+// }))
+app.use(cors())
 app.disable('x-powered-by')// deshabilitar el header x-Powered-By: Express
 
 // Todos los recursos que sean MOVIES se identifica con /movies
 app.get('/movies', (req, res) => {
-
-    
     const { genre } = req.query;
 
     if (genre) {
@@ -41,7 +40,6 @@ app.get('/movies', (req, res) => {
 
 app.delete('/movies/:id', (req, res) => {
     const {id} = req.params
-    console.log("id",id)
     const movieIndex = movies.findIndex(movie => movie.id == id)
     if (movieIndex === -1) return res.status(404).json({message: 'Movie not found'})
     movies.splice(movieIndex,1)
@@ -101,7 +99,7 @@ app.patch('/movies/:id', (req, res) =>{
     return res.json(updateMovie)
 })
 
-const PORT   = process.env.PORT ?? 123
+const PORT   = process.env.PORT ?? 1234
 
 app.listen(PORT, () => {
     console.log(`server listening on port http://localhost:${PORT}`)
