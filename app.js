@@ -14,7 +14,8 @@ app.use(cors({
             'http://localhost:123',
             'http://movies.com',
             'http://midu.dev',
-            'https://nodetestmovies-production.up.railway.app'
+            'https://nodetestmovies-production.up.railway.app',
+            'https://nodetestmovies-production.up.railway.app:8080'
         ]
         
         if (ACCEPTED_ORIGINS.includes(origin)) {
