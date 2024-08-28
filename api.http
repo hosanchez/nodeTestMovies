@@ -1,0 +1,31 @@
+### Recuperar todal las peliculas
+GET http://localhost:123/movies
+
+### Recuperar una película por id
+GET http://localhost:123/movies/dcdd0fad-a94c-4810-8acc-5f108d3b18c3
+
+### Recuperrar todas la peliculas por un género
+GET http://localhost:123/movies?genre=ACTION
+
+### Crear una pelicula con POST
+POST http://localhost:123/movies
+Content-Type: application/json
+
+{
+  "title": "The deadpool",
+  "year": 2024,
+  "director": "Christopher Nolan",
+  "duration": 152,
+  "poster": "https://i.ebayimg.com/images/g/yokAAOSw8w1YARbm/s-l1200.jpg",
+  "genre": ["Action", "Crime", "Drama"]
+}
+
+### Actualizar una pelicula
+PATCH http://localhost:123/movies/dcdd0fad-a94c-4810-8acc-5f108d3b18c3
+Content-Type: application/json
+
+{
+    "id": "ddsfdf",
+    "title": "uno",
+    "year": 2000
+}
