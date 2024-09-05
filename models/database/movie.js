@@ -1,51 +1,106 @@
-import { readJson } from "../utils.js";
-import { randomUUID } from "node:crypto";
+import mysql  from "mysql2/promise";
+import 'dotenv/config'
 
-const movies = readJson('./movies.json')
+const DEFAULT_CONFIG = {
+    host:'localhost',
+    user:'root',
+    port:3306,
+    password:'',
+    database:'moviesdb'
+}
+
+const connectionString = process.env.DATABASE_URL ?? DEFAULT_CONFIG
+// const connectionString = DEFAULT_CONFIG
+
+const connection = await mysql.createConnection(connectionString)
 
 export class MovieModel {
     static async getAll ({ genre}) {
+
         if (genre) {
-            return movies.filter(
-                movie => movie.genre.some(g => g.toLowerCase() === genre.toLowerCase())
-            )
+            const lowerCaseGenre = genre.toLowerCase() 
+
+            // get genre ids from database table using genre names
+            const [genres] = await connection.query(
+                'SELECT id, name FROM genre WHERE LOWER(name) = ?;', 
+                [lowerCaseGenre]
+            ) 
+
+            // no genre found
+            if (genres.length === 0) return []
+
+            //get the id from first genre result
+            const [{ id }] = genres
+
+            // get all movies ids from database table
+            // la query a movie_genres
+            // join
+            // y devolver resultados..
+            return []
+
         }
+
+        const [movies] = await connection.query(
+            'SELECT title, year, director, duration, poster, rate, BIN_TO_UUID(id) id FROM movie'
+        )
+
         return movies
     }
 
     static async getById({id}) {
-        const movie = movies.find(movie => movie.id === id)
-        return movie
+        const [movies] = await connection.query(
+            'SELECT title, year, director, duration, poster, rate, BIN_TO_UUID(id) id FROM movie Where id= UUID_TO_BIN(?)',
+            [id]
+        )
+
+        if (movies.length === 0) return null
+        
+        return movies[0]
     }
 
     static async create ({input}){
-        // En base de datos
-        const newMovie = {
-            id: randomUUID(), // uuid v4
-            ...input
+        const {
+            genre : genreInput, // genre is an array
+            title,
+            year,
+            duration,
+            director,
+            rate,
+            poster
+        } = input
+
+        const [uuidResult] = await connection.query('SELECT UUID() uuid;')
+        const [{ uuid }] = uuidResult
+
+        try {
+            await connection.query(
+                `INSERT INTO movie (id, title, year, director, duration, poster, rate)
+                VALUES (UUID_TO_BIN("${ uuid }"), ?, ?, ?, ?, ?, ?);`,
+                [title, year, director, duration, poster, rate]
+            )
+        } catch (error) {
+            // puede enviarle infromacion sensible
+            throw new Error("Error creating movie")
+            // enviar la traza a un servicio interno
+            //sendLog (e)  
         }
 
-        movies.push(newMovie)
-        return newMovie
+        const [movies] = await connection.query(
+            `SELECT title, year, director, duration, poster, rate, BIN_TO_UUID(id) id 
+            FROM movie WHERE id= UUID_TO_BIN(?);`,
+            [uuid]
+        )
+
+        return movies[0]
+        
     }
 
     static async delete ({id}){
-        const movieIndex = movies.findIndex(movie => movie.id === id)
-        if(movieIndex === -1) return false
-        movies.splice(movieIndex,1)
-        return true
+        
     }
 
     static async update ({id, input}){
-        const movieIndex = movies.findIndex( movie => movie.id === id)
-        if(movieIndex === -1) return false
-
-        movies[movieIndex] = {
-            ...movies[movieIndex],
-            ...input
-        }
-
-        return movies[movieIndex]
+       
     }
 }
 
